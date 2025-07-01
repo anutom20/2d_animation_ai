@@ -23,6 +23,9 @@ An AI-powered system that generates 2D animations using the Manim library based 
 - Implement safety checks for generated code
 - Add support for basic animation primitives
 
+### Token usage (phase 4)
+- a way to track token usage and cost
+
 ## Technical Architecture
 
 ### API Layer

@@ -5,7 +5,7 @@ from pathlib import Path
 import config
 from loguru import logger
 import os
-from app.agents.animation_agent import create_animation_agent
+from app.agents.code_generation_agent import create_code_generation_agent
 from typing import Optional
 from langchain.agents import AgentExecutor
 from app.config import OPENAI_API_KEY
@@ -17,7 +17,9 @@ router = APIRouter()
 
 
 class AnimationRequest(BaseModel):
-    prompt: str = "Create a simple animation with text 'Hello, World!' and color 'red'"
+    prompt: str = (
+        "Create a text animation that shows 'Hello World' appearing letter by letter in blue color, then scaling up and fading out"
+    )
 
 
 def get_agent():
@@ -29,7 +31,7 @@ def get_agent():
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="OpenAI API key not found. Please set OPENAI_API_KEY environment variable.",
         )
-    return create_animation_agent(openai_api_key=OPENAI_API_KEY)
+    return create_code_generation_agent(openai_api_key=OPENAI_API_KEY)
 
 
 @router.get("/")
@@ -47,7 +49,7 @@ async def create_animation(
     request: AnimationRequest, agent: AgentExecutor = Depends(get_agent)
 ):
     """
-    Create a simple animation with Manim using LangChain agent
+    Create an animation using AI-generated Manim code
     """
     logger.info(f"Creating animation with request: {request}")
     try:
@@ -57,24 +59,29 @@ async def create_animation(
 
         # Handle case where agent returned invalid JSON
         try:
-            json.loads(result["output"])
+            if isinstance(result["output"], str):
+                result_json = json.loads(result["output"])
+            else:
+                result_json = result["output"]
         except json.JSONDecodeError:
             logger.error(f"Failed to parse agent output as JSON: {result['output']}")
             return AnimationResponse(
                 animation_id="error",
                 status="error",
-                message="Animation created but agent returned invalid JSON response",
+                message="Animation creation failed: Invalid response format",
                 download_url="",
             )
 
-        # The result should already be in the correct format
-        return AnimationResponse(**json.loads(result["output"]))
+        # Return the structured response
+        return AnimationResponse(**result_json)
 
     except Exception as e:
         logger.error(f"Animation creation failed: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Animation creation failed: {str(e)}",
+        return AnimationResponse(
+            animation_id="error",
+            status="error",
+            message=f"Animation creation failed: {str(e)}",
+            download_url="",
         )
 
 
