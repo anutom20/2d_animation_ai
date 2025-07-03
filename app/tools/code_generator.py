@@ -131,62 +131,91 @@ def extract_scene_class(code: str) -> Optional[str]:
 
 def create_code_template(animation_type: str) -> str:
     """
-    Create a template for different types of animations.
+    Create a template for animations that demonstrates best practices and common patterns.
+    The template serves as a starting point and can be customized based on specific needs.
     """
-    templates = {
-        "text": """
-    from manim import *
+    return '''
+from manim import *
 
-    class TextScene(Scene):
-        def construct(self):
-            # Create and display text
-            text = Text("{text}")
-            self.play(Write(text))
-            self.wait()
-            # Add some animation
-            self.play(text.animate.scale(1.5))
-            self.wait()
-            self.play(FadeOut(text))
-    """,
-        "shape": """
-    from manim import *
+class AnimationScene(Scene):
+    def construct(self):
+        # Scene configuration
+        # You can customize background color, camera settings, etc.
+        # self.camera.background_color = "#333333"
+        
+        # ===== Object Creation =====
+        # Create your visual elements here
+        # Examples:
+        # - Text elements
+        title = Text("Your Title", font_size=48)
+        subtitle = Text("Your Subtitle", font_size=32)
+        
+        # - Geometric shapes
+        shapes = VGroup(
+            Circle(radius=1.0),
+            Square(side_length=2.0),
+            Triangle()
+        ).arrange(RIGHT, buff=0.5)
+        
+        # - Mathematical elements
+        equation = MathTex(r"E = mc^2")
+        
+        # ===== Initial Layout =====
+        # Position your elements
+        title.to_edge(UP)
+        subtitle.next_to(title, DOWN)
+        shapes.move_to(ORIGIN)
+        equation.to_edge(DOWN)
+        
+        # ===== Animation Sequence =====
+        # 1. Introduction sequence
+        self.play(Write(title))
+        self.wait(0.5)
+        self.play(FadeIn(subtitle))
+        self.wait()
+        
+        # 2. Main content
+        # Animate shapes one by one
+        for shape in shapes:
+            self.play(Create(shape))
+        self.wait()
+        
+        # Group animation example
+        self.play(
+            shapes.animate.scale(0.8),
+            equation.animate.scale(1.2)
+        )
+        self.wait()
+        
+        # Transform example
+        self.play(
+            Transform(shapes[0], shapes[1]),
+            shapes[2].animate.rotate(PI/2)
+        )
+        self.wait()
+        
+        # 3. Cleanup sequence
+        # Remove elements gracefully
+        self.play(
+            FadeOut(title),
+            FadeOut(subtitle),
+            FadeOut(shapes),
+            FadeOut(equation)
+        )
+        
+        # Optional final pause
+        self.wait()
 
-    class ShapeScene(Scene):
-        def construct(self):
-            # Create shapes
-            circle = Circle()
-            square = Square()
-            
-            # Position them
-            square.next_to(circle, RIGHT)
-            
-            # Animate them
-            self.play(Create(circle), Create(square))
-            self.wait()
-            self.play(
-                circle.animate.scale(1.5),
-                square.animate.rotate(PI/2)
-            )
-            self.wait()
-            self.play(FadeOut(circle), FadeOut(square))
-        """,
-        "math": """
-    from manim import *
-
-    class MathScene(Scene):
-        def construct(self):
-            # Create mathematical equation
-            equation = MathTex("{equation}")
-            
-            # Animate it
-            self.play(Write(equation))
-            self.wait()
-            self.play(equation.animate.scale(1.5))
-            self.wait()
-            self.play(FadeOut(equation))
-    """,
-    }
-    return templates.get(animation_type, templates["text"])
+    def create_highlighted_text(self, text: str, color: str = YELLOW) -> Text:
+        """Helper method for creating consistently styled text with highlights"""
+        return Text(text, color=color)
+    
+    def create_annotation(self, text: str, reference_obj: Mobject) -> Text:
+        """Helper method for creating annotations that point to other objects"""
+        annotation = Text(text, font_size=24)
+        annotation.next_to(reference_obj, RIGHT)
+        return annotation
+'''
 
 
 def generate_manim_code(prompt: str) -> str:
@@ -201,25 +230,57 @@ def generate_manim_code(prompt: str) -> str:
         )
 
         # Create the prompt template
-        template = """You are an expert in creating animations using the Manim library. Your task is to generate Python code for a Manim animation based on the following description.
+        template = """You are a world-class Python developer and animation expert, specializing in creating stunning visualizations using the Manim mathematical animation library. Your deep understanding of both programming principles and animation aesthetics allows you to create elegant, efficient, and visually appealing animations.
 
-        Rules and Requirements:
-        1. Only use allowed Manim classes: {allowed_classes}
-        2. Only use allowed Manim methods: {allowed_methods}
-        3. Code must follow this structure:
-        - Import from manim
-        - Define a Scene class
-        - Implement the construct method
-        4. Include appropriate timing and wait calls
-        5. Add helpful comments explaining the animation steps
-        6. Ensure all objects are properly cleaned up (e.g., FadeOut)
-        7. Use only safe operations (no file/system operations)
+        Your task is to generate clean, well-structured Python code for a Manim animation based on the following description.
+
+        Core Principles to Follow:
+        1. Code Structure and Style:
+           - Write clean, modular, and well-commented code
+           - Follow PEP 8 style guidelines
+           - Use meaningful variable names that reflect their purpose
+           - Break complex animations into logical steps
+           - Add comments explaining the purpose of each major section
+
+        2. Animation Best Practices:
+           - Ensure smooth transitions between animation states
+           - Use appropriate timing for visual clarity (self.wait())
+           - Group related animations when appropriate
+           - Consider the visual hierarchy and composition
+           - Implement proper object cleanup after use
+
+        3. Technical Requirements:
+           - Only use these allowed Manim classes: {allowed_classes}
+           - Only use these allowed Manim methods: {allowed_methods}
+           - Always use 'from manim import *' for imports
+           - Every animation must be in a Scene class
+           - Implement the construct method
+           - Ensure all objects are properly removed from scene (e.g., FadeOut)
+           - Focus on safe operations (no file/system operations)
+
+        4. Animation Flow Guidelines:
+           - Start with object creation and initial setup
+           - Build complexity gradually
+           - Use appropriate pacing (wait calls between significant changes)
+           - End scenes cleanly with proper object cleanup
+           - Consider the viewer's perspective and attention
+
+        5. Spatial Management and Canvas Awareness:
+           - Prevent objects from overlapping unintentionally
+           - Keep all elements within the visible canvas boundaries
+           - Use proper spacing between elements (buff parameter)
+           - Utilize layout methods (arrange, next_to, shift) for precise positioning
+           - Consider the aspect ratio and scale of all objects
+           - Plan the spatial journey of animated elements to avoid collisions
+           - Use coordinate system wisely (UP, DOWN, LEFT, RIGHT, ORIGIN)
+           - Group related objects using VGroup for better spatial management
+           - Test object positions before animations to ensure visibility
+           - Consider final positions of transformed objects
 
         Description of the desired animation:
         {prompt}
 
-        Generate ONLY the Python code without any explanation or markdown formatting. The code should be complete and ready to run.
-        always use from manim import * , don't use any other imports individually.
+        Generate ONLY the Python code without any explanation or markdown formatting. The code should be complete, well-commented, and ready to run.
         """
 
         prompt_template = PromptTemplate(

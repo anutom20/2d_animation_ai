@@ -11,13 +11,13 @@ An AI-powered system that generates 2D animations using the Manim library based 
 - Implement basic shapes, transformations, and text animations
 - Define a standard output format and resolution
 
-### 2. LangChain Integration (Phase 2)
+### 2. LangChain Integration (Phase 2) (Done)
 - Set up LangChain agent with custom tools
 - Create a Manim code generation tool
 - Implement code execution and validation pipeline
 - Handle error cases and provide feedback
 
-### 3. AI Code Generation (Phase 3)
+### 3. AI Code Generation (Phase 3) (in progress)
 - Design prompt engineering for Manim code generation
 - Create templates for common animation patterns
 - Implement safety checks for generated code
