@@ -17,7 +17,7 @@ An AI-powered system that generates 2D animations using the Manim library based 
 - Implement code execution and validation pipeline
 - Handle error cases and provide feedback
 
-### 3. AI Code Generation (Phase 3) (in progress)
+### 3. AI Code Generation (Phase 3) (Done)
 - Design prompt engineering for Manim code generation
 - Create templates for common animation patterns
 - Implement safety checks for generated code
