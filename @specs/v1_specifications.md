@@ -25,6 +25,16 @@ An AI-powered system that generates 2D animations using the Manim library based 
 
 ### Token usage (phase 4)
 - a way to track token usage and cost
+- limit the output sent to structured llm call to reduce token usage
+
+### Containerization and deployment
+**Details to be added later**
+
+### good frontend Ui , nextjs auth and db
+**Details to be added later**
+
+### saving files to s3 etc.. (optional)
+**Details to be added later**
 
 ## Technical Architecture
 
