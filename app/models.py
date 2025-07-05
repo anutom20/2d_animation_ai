@@ -8,5 +8,4 @@ class AnimationResponse(BaseModel):
     animation_id: str
     status: str
     message: str
-    file_path: Optional[str] = None
     download_url: str

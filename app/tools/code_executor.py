@@ -91,7 +91,6 @@ def execute_manim_code(code: str) -> Dict[str, Any]:
                     animation_id=animation_id,
                     status="success",
                     message="Animation created successfully from generated code!",
-                    file_path=str(output_path),
                     download_url=f"/download-animation/{animation_id}",
                 )
 
@@ -125,7 +124,6 @@ def get_code_execution_tool() -> Tool:
         {"animation_id": unique identifier,
         "status": success/error,
         "message": description of the result,
-        "file_path": path to the generated file,
         "download_url": URL to download the animation}
         
         return only json response and nothing else.

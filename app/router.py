@@ -8,6 +8,7 @@ import os
 from app.agents.code_generation_agent import create_code_generation_agent
 from typing import Optional
 from langchain.agents import AgentExecutor
+from langchain_openai import ChatOpenAI
 from app.config import OPENAI_API_KEY
 from app.models import AnimationResponse
 import json
@@ -59,10 +60,19 @@ async def create_animation(
 
         # Handle case where agent returned invalid JSON
         try:
-            if isinstance(result["output"], str):
-                result_json = json.loads(result["output"])
-            else:
-                result_json = result["output"]
+            structured_llm = ChatOpenAI(
+                model="o4-mini",
+                openai_api_key=OPENAI_API_KEY,
+            ).with_structured_output(AnimationResponse)
+
+            response_prompt = f"""
+            clean the follwing output and return the clean output in json format:
+            download_url = /download-animation/animation_id
+            {str(result["output"])}
+            """
+
+            response = structured_llm.invoke(response_prompt)
+            return AnimationResponse(**response.model_dump())
         except json.JSONDecodeError:
             logger.error(f"Failed to parse agent output as JSON: {result['output']}")
             return AnimationResponse(
@@ -73,7 +83,6 @@ async def create_animation(
             )
 
         # Return the structured response
-        return AnimationResponse(**result_json)
 
     except Exception as e:
         logger.error(f"Animation creation failed: {str(e)}")
