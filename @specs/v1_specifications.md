@@ -23,12 +23,31 @@ An AI-powered system that generates 2D animations using the Manim library based 
 - Implement safety checks for generated code
 - Add support for basic animation primitives
 
-### Token usage (phase 4)
+### Token usage (phase 4) (Done)
 - a way to track token usage and cost
 - limit the output sent to structured llm call to reduce token usage
 
 ### Containerization and deployment
-**Details to be added later**
+- write Dockerfile
+- write logic to create animations and code_files dir
+- use multi-stage build , choose lightweight  base docker image
+- install  FROM python:3.7
+
+    RUN apt-get update \
+    && apt-get install -qqy --no-install-recommends \
+        apt-utils \
+        ffmpeg \
+        sox \
+        libcairo2-dev \
+        texlive-full \
+        texlive-fonts-extra \
+        texlive-latex-extra \
+        texlive-latex-recommended \
+        texlive-science \
+        tipa \
+    && rm -rf /var/lib/apt/lists/*
+
+   these dependencies 
 
 ### good frontend Ui , nextjs auth and db
 **Details to be added later**
