@@ -36,6 +36,8 @@ An AI-powered system that generates 2D animations using the Manim library based 
 ### saving files to s3 etc.. (optional)
 **Details to be added later**
 
+### Dockerize the entire application
+
 ## Technical Architecture
 
 ### API Layer

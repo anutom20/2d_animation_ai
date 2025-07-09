@@ -6,6 +6,7 @@ from app.tools.code_executor import get_code_execution_tool
 from typing import Dict, Any
 from loguru import logger
 
+
 def create_code_generation_agent(openai_api_key: str) -> AgentExecutor:
     """
     Create a LangChain agent for generating and executing Manim code
@@ -29,8 +30,9 @@ def create_code_generation_agent(openai_api_key: str) -> AgentExecutor:
     def agent_executor(input_data: Dict[str, Any]) -> Dict[str, Any]:
         try:
             # First, generate the code
-            generation_result = agent.invoke({
-                "input": f"""Generate Manim code for the following animation: {input_data['input']}. 
+            generation_result = agent.invoke(
+                {
+                    "input": f"""Generate Manim code for the following animation: {input_data['input']}. 
                 Return structured output in following format:
                 {{
                     "animation_id": unique identifier,
@@ -40,7 +42,8 @@ def create_code_generation_agent(openai_api_key: str) -> AgentExecutor:
                 }}
                 don't return anything else.
                 """
-            })
+                }
+            )
 
             logger.info(f"Generated code: {generation_result}")
 

@@ -11,6 +11,7 @@ from langchain.agents import AgentExecutor
 from langchain_openai import ChatOpenAI
 from app.config import OPENAI_API_KEY
 from app.models import AnimationResponse
+from langchain_community.callbacks import get_openai_callback
 import json
 
 # Create router instance
@@ -55,7 +56,12 @@ async def create_animation(
     logger.info(f"Creating animation with request: {request}")
     try:
         # Run the agent
-        result = agent.invoke({"input": request.prompt})
+        with get_openai_callback() as cb:
+            result = agent.invoke({"input": request.prompt})
+            logger.info(f"Total tokens: {cb.total_tokens}")
+            logger.info(f"Prompt tokens: {cb.prompt_tokens}")
+            logger.info(f"Completion tokens: {cb.completion_tokens}")
+            logger.info(f"Total cost: {cb.total_cost}")
         logger.info(f"Result: {result}")
 
         # Handle case where agent returned invalid JSON
@@ -97,18 +103,47 @@ async def create_animation(
 @router.get("/download-animation/{animation_id}")
 async def download_animation(animation_id: str):
     """
-    Download a generated animation
+    Download a generated animation and cleanup files afterward
     """
-    file_path = config.ANIMATIONS_DIR / f"animation_{animation_id}.mp4"
+    animation_file_path = config.ANIMATIONS_DIR / f"animation_{animation_id}.mp4"
+    code_file_path = Path("code_files") / f"animation_{animation_id}.py"
 
-    if not file_path.exists():
+    if not animation_file_path.exists():
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Animation not found"
         )
 
-    return FileResponse(
-        path=file_path, media_type="video/mp4", filename=f"animation_{animation_id}.mp4"
+    # Create a response with the file
+    response = FileResponse(
+        path=animation_file_path,
+        media_type="video/mp4",
+        filename=f"animation_{animation_id}.mp4",
     )
+
+    # Delete the animation file after sending
+    try:
+        # Schedule the files for deletion after the response is sent
+        response.background = lambda: cleanup_files(animation_file_path, code_file_path)
+    except Exception as e:
+        logger.error(
+            f"Failed to schedule cleanup for animation {animation_id}: {str(e)}"
+        )
+
+    return response
+
+
+def cleanup_files(animation_path: Path, code_path: Path):
+    """Helper function to cleanup animation and code files"""
+    try:
+        if animation_path.exists():
+            animation_path.unlink()
+            logger.info(f"Deleted animation file: {animation_path}")
+
+        if code_path.exists():
+            code_path.unlink()
+            logger.info(f"Deleted code file: {code_path}")
+    except Exception as e:
+        logger.error(f"Error during file cleanup: {str(e)}")
 
 
 @router.get("/list-animations")
