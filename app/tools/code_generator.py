@@ -276,6 +276,8 @@ def generate_manim_code(prompt: str) -> str:
            - Group related objects using VGroup for better spatial management
            - Test object positions before animations to ensure visibility
            - Consider final positions of transformed objects
+        
+        6. Don't use Tex library at all for any math related animations. tex is not installed in the container.
 
         Description of the desired animation:
         {prompt}
