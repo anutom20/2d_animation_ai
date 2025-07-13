@@ -1,0 +1,1 @@
+docker buildx build -t 2d-animation-ai .

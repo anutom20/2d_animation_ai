@@ -1,0 +1,8 @@
+animations/
+code_files/
+scripts/
+.dockerignore
+media/
+@specs/
+venv/
+.env.example
