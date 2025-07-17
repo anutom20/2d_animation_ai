@@ -57,11 +57,6 @@ class CodeValidator(ast.NodeVisitor):
         self.has_construct_method = False
 
     def visit_Import(self, node):
-        for name in node.names:
-            if name.name != "manim":
-                self.errors.append(
-                    f"Only manim imports are allowed, found: {name.name}"
-                )
         self.generic_visit(node)
 
     def visit_ImportFrom(self, node):

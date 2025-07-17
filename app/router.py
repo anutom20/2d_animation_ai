@@ -81,22 +81,18 @@ async def create_animation(
             return AnimationResponse(**response.model_dump())
         except json.JSONDecodeError:
             logger.error(f"Failed to parse agent output as JSON: {result['output']}")
-            return AnimationResponse(
-                animation_id="error",
-                status="error",
-                message="Animation creation failed: Invalid response format",
-                download_url="",
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to parse agent output as JSON",
             )
 
         # Return the structured response
 
     except Exception as e:
         logger.error(f"Animation creation failed: {str(e)}")
-        return AnimationResponse(
-            animation_id="error",
-            status="error",
-            message=f"Animation creation failed: {str(e)}",
-            download_url="",
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Animation creation failed: {str(e)}",
         )
 
 
