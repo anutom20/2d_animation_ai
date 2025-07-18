@@ -166,3 +166,5 @@ Desktop.ini
 *.tmp
 *.temp
 *.bak 
+
+app/config.py

@@ -27,16 +27,16 @@ class SimpleScene(Scene):
         self.play(FadeOut(title))
 
 
-def create_animation(input_dict: str) -> Dict[str, Any]:
+def create_animation(input_str: str) -> Dict[str, Any]:
     """
     Create a simple animation with Manim
     """
     try:
         # Parse the input dictionary
-        input_dict = json.loads(input_dict)
+        input_dict = json.loads(input_str)
 
-        # Generate unique filename
-        animation_id = str(uuid.uuid4())
+        # Get animation_id from input or generate one
+        animation_id = input_dict.get("animation_id", str(uuid.uuid4()))
         output_file = f"animation_{animation_id}"
 
         # Create and render the scene
@@ -84,8 +84,9 @@ def get_manim_tool() -> Tool:
         name="create_manim_animation",
         func=create_animation,
         description="""Create a simple animation using Manim.
-        Input should be a stringified dictionary with optional 'text' and 'color' keys.
-        Example: '{"text": "Hello World!", "color": "BLUE"}'
+        Input should be a stringified dictionary with optional 'text', 'color', and 'animation_id' keys.
+        Example: '{"text": "Hello World!", "color": "BLUE", "animation_id": "optional_id"}'
+        If animation_id is not provided, a new UUID will be generated.
         Returns a structured json response with animation details including:
         {
             "animation_id": unique identifier,

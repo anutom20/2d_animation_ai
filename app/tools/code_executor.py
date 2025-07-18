@@ -18,23 +18,37 @@ class CodeExecutionError(Exception):
     pass
 
 
-def execute_manim_code(code: str) -> Dict[str, Any]:
+def execute_manim_code(input_str: str) -> Dict[str, Any]:
     """
     Execute the generated Manim code safely and return the animation details.
+    Accepts either just code as string or JSON with code and animation_id.
     """
-    # First validate the code
-    errors = validate_manim_code(code)
-    if errors:
-        raise CodeExecutionError(f"Code validation failed: {', '.join(errors)}")
-
     try:
+        # Try to parse as JSON first (new format with animation_id)
+        try:
+            input_data = json.loads(input_str)
+            code = input_data.get("code", input_str)
+            animation_id = input_data.get("animation_id")
+        except json.JSONDecodeError:
+            # Fallback to old format (just code string)
+            code = input_str
+            animation_id = None
+    
+        # Generate animation_id if not provided
+        if not animation_id:
+            animation_id = str(uuid.uuid4())
+    
+        # First validate the code
+        errors = validate_manim_code(code)
+        if errors:
+            raise CodeExecutionError(f"Code validation failed: {', '.join(errors)}")
+
         # Create a temporary directory for the code
         with tempfile.TemporaryDirectory() as temp_dir:
             media_dir = Path("media")
             code_dir = Path("code_files")
 
-            # Generate unique filename
-            animation_id = str(uuid.uuid4())
+            # Use the provided or generated animation_id
             code_file = code_dir / f"animation_{animation_id}.py"
 
             # Write the code to a file
@@ -113,7 +127,11 @@ def get_code_execution_tool() -> Tool:
         name="execute_manim_code",
         func=execute_manim_code,
         description="""Execute Manim code and generate an animation.
-        Input should be valid Manim Python code as a string.
+        Input can be either:
+        1. Valid Manim Python code as a string (legacy format)
+        2. JSON string with 'code' and optional 'animation_id' keys:
+           {"code": "manim_code_here", "animation_id": "optional_id"}
+        
         The code must:
         - Define a Scene class
         - Have a construct method
