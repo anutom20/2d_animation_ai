@@ -18,8 +18,6 @@ ALLOWED_MANIM_CLASSES = {
     "Line",
     "Dot",
     "VGroup",
-    "MathTex",
-    "Tex",
     "Write",
     "FadeIn",
     "FadeOut",
@@ -151,16 +149,7 @@ class AnimationScene(Scene):
             Square(side_length=2.0),
             Triangle()
         ).arrange(RIGHT, buff=0.5)
-        
-        # - Mathematical elements
-        equation = MathTex(r"E = mc^2")
-        
-        # ===== Initial Layout =====
-        # Position your elements
-        title.to_edge(UP)
-        subtitle.next_to(title, DOWN)
-        shapes.move_to(ORIGIN)
-        equation.to_edge(DOWN)
+    
         
         # ===== Animation Sequence =====
         # 1. Introduction sequence
@@ -272,7 +261,8 @@ def generate_manim_code(prompt: str) -> str:
            - Test object positions before animations to ensure visibility
            - Consider final positions of transformed objects
         
-        6. Don't use Tex library at all for any math related animations. tex is not installed in the container.
+        6. Don't use Tex library at all for any math related animations or equations. tex is not installed in the container.
+           Use other things like Text and other similar things only
 
         Description of the desired animation:
         {prompt}
@@ -323,6 +313,8 @@ def get_code_generation_tool() -> Tool:
         - Timing preferences (if any)
         - Color and style preferences (if any)
         - Any specific effects or transitions
+        - any mathematical equations should not use Mathtex or Tex , but should use native things like Text and other
+          similar classes
         
         Example input: "Create a text animation that shows 'Hello World' appearing letter by letter in blue color, then scaling up and fading out"
         
