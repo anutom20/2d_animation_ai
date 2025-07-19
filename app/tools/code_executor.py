@@ -33,11 +33,11 @@ def execute_manim_code(input_str: str) -> Dict[str, Any]:
             # Fallback to old format (just code string)
             code = input_str
             animation_id = None
-    
+
         # Generate animation_id if not provided
         if not animation_id:
             animation_id = str(uuid.uuid4())
-    
+
         # First validate the code
         errors = validate_manim_code(code)
         if errors:
@@ -75,7 +75,7 @@ def execute_manim_code(input_str: str) -> Dict[str, Any]:
                     cmd,
                     capture_output=True,
                     text=True,
-                    timeout=30,  # 30 seconds timeout
+                    timeout=180,  # 180 seconds timeout
                 )
 
                 logger.debug(f"Manim execution result: {result.stdout}")
