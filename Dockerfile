@@ -10,11 +10,11 @@ RUN apt-get update && apt-get install -y \
         libcairo2-dev \
         libpango1.0-dev\
         # not enough money to run texlive for resources :D
-        # texlive-full \
-        # texlive-fonts-extra \
-        # texlive-latex-extra \
-        # texlive-latex-recommended \
-        # texlive-science \
+        texlive-full \
+        texlive-fonts-extra \
+        texlive-latex-extra \
+        texlive-latex-recommended \
+        texlive-science \
         tipa \
     && rm -rf /var/lib/apt/lists/*
 # Install uv
